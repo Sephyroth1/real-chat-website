@@ -1,0 +1,29 @@
+{
+  "name": "real-chat-backend",
+  "version": "1.0.0",
+  "description": "This is a real-time messaging website",
+  "license": "ISC",
+  "author": "Sudhamshu",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "serve": "nodemon app.js",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.9",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.4.0",
+    "chai": "^5.1.2",
+    "express": "^4.21.2",
+    "mocha": "^11.1.0",
+    "sinon": "^19.0.2",
+    "supertest": "^7.0.0"
+  }
+}

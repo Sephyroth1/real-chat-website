@@ -13,4 +13,4 @@
 
 - **Just simply log in and chat**: that's it! it's as simple as that!
 
-If you want to chat to your friend, Might as well tell him about it.H
+If you want to chat to your friend, Might as well tell them about it!

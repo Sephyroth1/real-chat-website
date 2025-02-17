@@ -21,7 +21,7 @@ function poolConnect() {
     return async (query, params) => { 
         try {
             const result = await pool.query(query, params)
-            return result.rows;
+            return result;
         } catch (error) {
             console.error("Error: ", error.message);
             throw new Error("Error Stack: ", error.stack);

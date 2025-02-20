@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { bcryptjs } from "bcryptjs";
-import poolQuery from "../databaseConnect.js";
+import poolConnect from "../databaseConnect.js";
 import verifyToken from "../middleware/middleware.js";
 
 
@@ -28,7 +28,7 @@ module.exports = () => {
                 })
             }
 
-            const {rows} = await db.query(
+            const {rows} = await poolConnect(
                 "INSERT INTO users (username, email, password, createdAt, updatedAt) VALUES ($1, $2, $3, $4, $5) RETURNING *;",
                 [username, email, hashedPassword, new Date(), new Date()]
             );
@@ -41,7 +41,10 @@ module.exports = () => {
 
             return res.status(201).send({
                 message: "User Created Successfully",
-                user: rows.rows[0],
+                user: {
+                    username: rows.username,
+                    email: rows.email
+                },
             });
         }
         catch(error){
@@ -66,7 +69,7 @@ module.exports = () => {
             }
 
             // Get the user from the database
-            const result = await db.query(
+            const result = await poolConnect(
                 "SELECT id, username, email, password FROM users WHERE username = $1 AND email = $2",
                 [username, email]
             );
@@ -140,7 +143,7 @@ module.exports = () => {
     
     router.delete("/delete/:id", async (req, res) => {
         const { id } = req.params;
-        const query = await db.query(
+        const query = await poolConnect(
             "SELECT username, email FROM users where id = $1",
             [id]
         );
@@ -151,7 +154,7 @@ module.exports = () => {
             });
         }
 
-        const deleteQuery = await db.query("DELETE FROM users WHERE id = $1", [id]);
+        const deleteQuery = await poolConnect("DELETE FROM users WHERE id = $1", [id]);
 
         if (deleteQuery.rowCount <= 0) {
             res.status(500).send({
@@ -167,16 +170,10 @@ module.exports = () => {
     });
 
 
-    // Get all users
-    router.get("/profile", verifyToken, async (req, res) => {
-        const { rows } = await db.query("SELECT * from users");
-        res.send(rows[0]);
-    });
-
     // Get Users By User Id
-    router.get("/profile/:id", verifyToken, async (req, res) => {
-        const { id } = req.params;
-        const { rows } = await db.query("SELECT * FROM users where id = $1", [id]);
+    router.get("/profile", verifyToken, async (req, res) => {
+        const { id } = req.user;
+        const { rows } = await poolConnect("SELECT * FROM users where id = $1", [id]);
         if (rows.rowCount <= 0) {
             res.status(400).send("User Could not be found");
         }
@@ -189,7 +186,7 @@ module.exports = () => {
             const { id } = req.params;
             const { username, email, password } = req.body;
 
-            const selectQuery = await db.query(
+            const selectQuery = await poolConnect(
                 "SELECT username, email, password, FROM users WHERE id = $1",
                 [id]
             );
@@ -214,7 +211,7 @@ module.exports = () => {
             }
 
             const hashedPassword = await bcryptjs.hash(updatedUser.password, 10);
-            const updateQuery = await db.query(
+            const updateQuery = await poolConnect(
                 "UPDATE users SET username = $1, email = $2, password = $3 WHERE chat_id = $2",
                 [updatedUser.username, updatedUser.email, updatedUser.password]
             );

@@ -1,26 +1,40 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
 import ListItemButton from "@mui/material/ListItemButton"
 import ListItemText from "@mui/material/ListItemText"
-import ListItemAvatar from "@mui/material/ListItemAvatar"
-import Avatar from "@mui/material/Avatar"
-import Badge from "@mui/material/Badge"
 import Box from "@mui/material/Box"
-import { mockContacts } from "../mockData"
+import { type User } from "../mockData"
+import axios from "axios";
+
 
 function Sidebar({ onSelectContact }: { onSelectContact: (contactId: string) => void }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const [userChat, setUserChat] = useState<User[] | null>();
 
   const handleListItemClick = (index: number) => {
     setSelectedIndex(index)
-    onSelectContact(mockContacts[index].id)
+    if(!userChat) return null
+    onSelectContact(userChat[index].id)
   }
+  
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/v1/userChat`); 
+        const users: User[] = response.data;
+        setUserChat(users);
+      } catch (error: unknown) {
+        throw new Error(`Error: ${error}`)
+      }
+    }
+    fetchData();
+  })
 
   return (
     <Box sx={{ width: 300, bgcolor: "#c1121f", overflowY: "auto" }}>
       <List>
-        {mockContacts.map((contact, index) => (
+        {userChat?.map((contact, index) => (
           <ListItem key={contact.id} disablePadding>
             <ListItemButton
               selected={selectedIndex === index}
@@ -40,8 +54,7 @@ function Sidebar({ onSelectContact }: { onSelectContact: (contactId: string) => 
                 </Badge>
               </ListItemAvatar>*/}
               <ListItemText
-                primary={contact.name}
-                secondary={contact.lastMessage}
+                primary={contact.username}
                 primaryTypographyProps={{ color: "#fdf0d5" }}
                 secondaryTypographyProps={{ color: "#fdf0d5", noWrap: true }}
               />

@@ -1,12 +1,13 @@
 import { Router } from "express";
 import * as db from "../db/index.js";
+import verifyToken from "../middleware/middleware.js";
 
 const router = new Router();
 
 // Get all of the chat a user is associated with
-router.get("/:id", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.user;
 		const { rows } = await db.query(
 			"SELECT c.chat_id, c.chat_name, c.created_at FROM userchats uc JOIN chat c ON uc.chat_id = c.chat_id WHERE uc.user_id = $1",
 			[id]

@@ -1,52 +1,61 @@
-export interface Contact {
-  id: string
-  name: string
-  avatar: string
-  lastMessage: string
-  unreadCount: number
+
+export interface User {
+  id: string,
+  username: string,
+  email: string,
+  password: string,
 }
 
+//export interface Message {
+//  id: string
+//  text: string
+//  sender: "user" | "contact"
+//  timestamp: Date
+//}
+
 export interface Message {
-  id: string
-  text: string
-  sender: "user" | "contact"
-  timestamp: Date
+  message_id: string,
+  chat_id: string,
+  sender_id: string,
+  message: string,
+  created_at: number 
+}
+
+export interface Chat {
+  id: string,
+  chat_name: string,
+  created_at: Date,
 }
 
 export const mockContacts: Contact[] = [
   {
     id: "1",
     name: "Alice Johnson",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    lastMessage: "Hey, how are you doing?",
+    message: "Hey, how are you doing?",
     unreadCount: 2,
   },
   {
     id: "2",
     name: "Bob Smith",
-    avatar: "https://i.pravatar.cc/150?img=2",
-    lastMessage: "Did you see the game last night?",
+    message: "Did you see the game last night?",
     unreadCount: 0,
   },
   {
     id: "3",
     name: "Charlie Brown",
-    avatar: "https://i.pravatar.cc/150?img=3",
-    lastMessage: "Can you help me with the project?",
+    message: "Can you help me with the project?",
     unreadCount: 1,
   },
   {
     id: "4",
     name: "Diana Ross",
-    avatar: "https://i.pravatar.cc/150?img=4",
-    lastMessage: "Thanks for the birthday wishes!",
+    message: "Thanks for the birthday wishes!",
     unreadCount: 0,
   },
   {
     id: "5",
     name: "Ethan Hunt",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    lastMessage: "Mission accomplished!",
+    message: "Mission accomplished!",
     unreadCount: 3,
   },
 ]

@@ -5,15 +5,23 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import TextField from "@mui/material/TextField"
 import Button from "@mui/material/Button"
+import axios from "axios";
 
-function LoginPage({ onLogin }: { onLogin: () => void }) {
+function LoginPage() {
   const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("")
 
-  const handleLogin = () => {
-    // In a real app, you would validate the credentials here
-    if (username && password) {
-      onLogin()
+  const handleLogin = async () => {
+    try {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        const isValidEmail = regex.test(email);
+        if(isValidEmail) {
+          const response= await axios.post(`http://localhost:3000/api/v1/user`, {username, email, password})
+          return response.data;
+        }
+    } catch (error) {
+      throw new Error(`Error: ${error}`)
     }
   }
 
@@ -47,6 +55,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
         }}
       >
         <TextField label="Username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <TextField label="Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} />
         <TextField
           label="Password"
           type="password"

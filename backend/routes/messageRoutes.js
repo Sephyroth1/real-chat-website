@@ -6,10 +6,11 @@ module.exports = (io) => {
 	const router = Router();
 
 	// Get all messages of a chat
-	router.get("/:user_id/:chat_id", verifyToken, async (req, res) => {
+	router.get("/:chat_id", verifyToken, async (req, res) => {
 		try {
-			const { user_id, chat_id } = req.params;
-			const { rows } = await db.query(
+			const { chat_id } = req.params;
+			const { user_id } = req.user.id;
+			const { rows } = await poolConnect(
 				"SELECT message FROM messages WHERE user_id = $1 AND chat_id = $2",
 				[user_id, chat_id]
 			);
@@ -32,10 +33,11 @@ module.exports = (io) => {
 	});
 
 	// Get a specific message of a chat posted by a user
-	router.get("/:user_id/:chat_id/:message_id", async (req, res) => {
+	router.get("/:chat_id/:message_id", verifyToken,async (req, res) => {
 		try {
-			const { user_id, chat_id, message_id } = req.params;
-			const { rows } = await db.query(
+			const { chat_id, message_id } = req.params;
+			const { user_id } = req.user.id;
+			const { rows } = await poolConnect(
 				"SELECT message FROM messages WHERE user_id = $1 AND chat_id = $2 AND message_id = $3",
 				[user_id, chat_id, message_id]
 			);
@@ -57,13 +59,14 @@ module.exports = (io) => {
 		}
 	});
 
-	router.post("/:user_id/:chat_id", async (req, res) => {
+	router.post("/:chat_id", verifyToken, async (req, res) => {
 	  try {
-		const { user_id, chat_id } = req.params;
+		const { chat_id } = req.params;
+		const { user_id } = req.user.id;
 		const { message } = req.body;
 		
 		// Corrected SQL query: include user_id and chat_id in the insertion
-		const result = await db.query(
+		const result = await poolConnect(
 		  "INSERT INTO messages (user_id, chat_id, message) VALUES ($1, $2, $3) RETURNING *",
 		  [user_id, chat_id, message]
 		);
@@ -92,11 +95,12 @@ module.exports = (io) => {
 	  }
 	});
 
-	router.put("/:user_id/:chat_id/:message_id", async (req, res) => {
+	router.put("/:chat_id/:message_id", async (req, res) => {
 	  try {
-		const { user_id, chat_id, message_id } = req.params;
+		const { chat_id, message_id } = req.params;
+		const { user_id } = req.user.id;
 		const { message } = req.body;
-		const result = await db.query(
+		const result = await poolConnect(
 		  "UPDATE messages SET message = $1 WHERE user_id = $2 AND chat_id = $3 AND message_id = $4 RETURNING *",
 		  [message, user_id, chat_id, message_id]
 		);
@@ -128,10 +132,11 @@ module.exports = (io) => {
 	});
 
 
-	router.delete("/:user_id/:chat_id/:message_id", async (req, res) => {
+	router.delete("/:chat_id/:message_id", async (req, res) => {
 	  try {
-		const { user_id, chat_id, message_id } = req.params;
-		const result = await db.query(
+		const { chat_id, message_id } = req.params;
+		const { user_id } = req.user.id;
+		const result = await poolConnect(
 		  "DELETE FROM messages WHERE user_id = $1 AND chat_id = $2 AND message_id = $3 RETURNING *",
 		  [user_id, chat_id, message_id]
 		);

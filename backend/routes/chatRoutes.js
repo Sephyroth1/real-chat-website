@@ -4,21 +4,9 @@ import verifyToken from "../middleware/middleware.js";
 
 const router = Router();
 
-router.get("/", verifyToken, async (_, res) => {
-	const getAll = await poolConnect("SELECT * FROM chat");
 
-	if (getAll.rowCount<= 0) {
-		res.status(400).send("Chat couldn't be found");
-	}
-
-	res.status(200).send({
-		message: "Chat fetched Successfully",
-		chat: getAll.rows[0],
-	});
-});
-
-router.get("/:chat_id", verifyToken, async (req, res) => {
-	const { chat_id } = req.params;
+router.get("/", verifyToken, async (req, res) => {
+	const { chat_id } = req.user.id;
 	const getById = await poolConnect("SELECT * FROM chat where chat_id = $1", [
 		chat_id,
 	]);
